@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Türkiye vs İngiltere Grafiği</title>
+    <link rel="stylesheet" href="style.css">
+<script>
+window.onload = function () {
+              
+        
+        var options = {
+            animationEnabled: true,
+            theme: "white",
+            title:{
+                text: "TÜRKİYE  vs  İNGİLTERE"
+            },
+            axisX:{
+                valueFormatString: "DD MMM YYYY"
+            },
+            axisY: {
+                title: "AKTİF VAKA SAYILARI",
+                suffix: "K",
+                minimum: 0,
+            },
+            toolTip:{
+                shared:true
+            },  
+            legend:{
+                cursor:"pointer",
+                verticalAlign: "bottom",
+                horizontalAlign: "left",
+                dockInsidePlotArea: true,
+                itemclick: toogleDataSeries
+            },
+        };
+        
+        var tr = [];
+        var uk = [];
+
+        options.data = [
+            {
+                type: "line",
+                showInLegend: true,
+                name: "Türkiye Vaka Sayısı",
+                markerType: "square",
+                xValueFormatString: "DD MMM YYYY",
+                color: "red",
+                yValueFormatString: "#,##0K"
+            },
+            {
+                type: "line",
+                showInLegend: true,
+                name: "İngiltere Vaka Sayısı",
+                lineDashType: "dash",
+                color: "#0d0b8c",
+                yValueFormatString: "#,##0K"
+            },
+        ];
+        
+         $.ajax({
+                type: 'GET',
+                url: 'https://api.covid19api.com/country/turkey?from=2020-10-01T00:00:00Z&to=2021-01-15T00:00:00Z',
+                dataType: 'json',
+                success: function(data) {
+                    for (i = 0; i < data.length; i++) {
+                        tr.push({x: new Date(data[i].Date), y: data[i].Active})
+                    }
+                    options.data[0].dataPoints = tr;
+                    $("#chartContainer").CanvasJSChart(options); 
+                }
+            });
+           
+            
+            $.ajax({
+                type: 'GET',
+                url: 'https://api.covid19api.com/country/uk?from=2020-10-01T00:00:00Z&to=2021-01-15T00:00:00Z',
+                dataType: 'json',
+                success: function(data) {
+                    for (i = 0; i < data.length; i++) {
+                        uk.push({x: new Date(data[i].Date), y: data[i].Active})
+                    }
+                    options.data[1].dataPoints = uk;
+                    $("#chartContainer").CanvasJSChart(options); 
+                    
+                }
+            });	
+        
+            
+            
+            
+           
+        function toogleDataSeries(e){
+            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            } else{
+                e.dataSeries.visible = true;
+            }
+            e.chart.render();
+        }
+        
+        }
+        </script>
+
+</head>
+<body>
+<div id="chartContainer" style="height: 395px; width: 100%;"></div>
+<script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+<script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+</body>
+</html>
